@@ -1,9 +1,9 @@
-# Gemini AI Demo
+# AI Image Generator  Demo
 <a name="readme-top"></a>
 [![NextJS]][NextJS-url]
 ## About The Project
 
-![Gemini AI Demo][screenshot]
+![AI Image Generator  Demo][screenshot]
 
 ## This project is a demonstration of an AI Image Generator powered by OpenAI, utilizing NextJS server actions. I've documented the entire process [here][Article-url]! You can test it out [here][Demonstration-url]
 
@@ -19,7 +19,6 @@
 ### Libraries / Frameworks Used
 
 * [![NextJS]][NextJS-url]
-* [![GoogleGemini]][GoogleGemini-url]
 * [![OpenAI]][OpenAI-url]
 
 
@@ -27,7 +26,7 @@
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/CharlesAE/gemini-ai-demo.git
+   git clone https://github.com/CharlesAE/image-generator.git
    ```
 2. Install Dependencies
     ```sh
@@ -42,9 +41,9 @@
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Demo
-Desktop            |  Mobile
-:-------------------------:|:-------------------------:
-![Desktop][desktop]  |   ![Mobile][mobile]  
+Desktop            
+:-------------------------:
+![Desktop][desktop] 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Contact
@@ -76,7 +75,7 @@ Charles Edwards - [https://charlesae.dev](https://charlesae.dev)
 [OpenAI-url]: https://vercel.com/home
 [Medium]: https://img.shields.io/badge/medium-%2312100E.svg?&style=flat-square&logo=medium&logoColor=white
 [Medium-url]: https://medium.com/@CharlesAE
-[Article-url]: https://medium.com/technology-hits/lets-build-an-ai-chatbot-with-gemini-ai-in-next-js-14-fc74e5c3a70d
+[Article-url]: https://medium.com/
 [Demonstration-url]: https://openai-image-generator-orpin.vercel.app/
 [Typescript-url]: https://typescriptlang.org/
 [Typescript]:https://img.shields.io/badge/-TypeScript-%23282C34?style=flat-square&logo=typescript&logoColor=007bcd
