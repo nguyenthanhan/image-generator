@@ -12,7 +12,8 @@
 # next.js
 /.next/
 /out/
-
+.env
+README.md
 # production
 /build
 
