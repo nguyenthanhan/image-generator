@@ -75,10 +75,9 @@ Charles Edwards - [https://charlesae.dev](https://charlesae.dev)
 [OpenAI-url]: https://vercel.com/home
 [Medium]: https://img.shields.io/badge/medium-%2312100E.svg?&style=flat-square&logo=medium&logoColor=white
 [Medium-url]: https://medium.com/@CharlesAE
-[Article-url]: https://medium.com/
+[Article-url]: https://medium.com/technology-hits/lets-build-an-image-generator-using-openai-and-next-js-14-server-actions-19915664d4b8
 [Demonstration-url]: https://openai-image-generator-orpin.vercel.app/
 [Typescript-url]: https://typescriptlang.org/
 [Typescript]:https://img.shields.io/badge/-TypeScript-%23282C34?style=flat-square&logo=typescript&logoColor=007bcd
 [screenshot]: https://raw.githubusercontent.com/CharlesAE/image-generator/main/screenshots/image_generator.png
 [desktop]: https://raw.githubusercontent.com/CharlesAE/image-generator/main/screenshots/charl_e.gif
-[mobile]: https://raw.githubusercontent.com/CharlesAE/image-generator/main/screenshots/mobile.gif 
