@@ -20,19 +20,28 @@ To read more about using these font, please visit the Next.js documentation:
 "use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { generateImageByRunwareAI } from "@/app/actions";
+import { generateImageByRunwareAI, generateImageByOpenAI } from "@/app/actions";
 import { useState } from "react";
 import Image from "next/image";
+
+const isUseRunwareAI = process.env.NEXT_PUBLIC_PLATFORM === "RUNWARE_AI";
+const isUseDallE = process.env.NEXT_PUBLIC_PLATFORM === "DALL_E";
 
 export function Generator() {
   const [url, setUrl] = useState("");
 
   const action = async (formData: FormData) => {
-    // const imageData = await generateImageByOpenAI(formData);
-    // setUrl(imageData?.data?.[0]?.url ?? "");
-
-    const imageData = await generateImageByRunwareAI(formData);
-    setUrl(imageData?.[0]?.imageURL ?? "");
+    try {
+      if (isUseDallE) {
+        const imageData = await generateImageByOpenAI(formData);
+        setUrl(imageData?.data?.[0]?.url ?? "");
+      } else if (isUseRunwareAI) {
+        const imageData = await generateImageByRunwareAI(formData);
+        setUrl(imageData?.[0]?.imageURL ?? "");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <main className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
