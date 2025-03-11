@@ -24,7 +24,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -43,32 +43,49 @@ export default function Home() {
         </Toolbar>
       </AppBar>
 
-      <Container disableGutters>
-        <ImageGeneratorForm
-          setImages={setImages}
-          setLoading={setLoading}
-          loading={loading}
-          setError={setError}
-        />
+      <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+        <Grid container sx={{ height: "100%" }}>
+          {/* Left column - Form (1/3 width) */}
+          <Grid
+            size={{ xs: 12, md: 4 }}
+            sx={{
+              height: "100%",
+              overflow: "auto",
+              p: 2,
+            }}
+          >
+            <ImageGeneratorForm
+              setImages={setImages}
+              setLoading={setLoading}
+              loading={loading}
+              setError={setError}
+            />
+          </Grid>
 
-        <ImageDisplay images={images} loading={loading} error={error} />
+          {/* Right column - Image Display (2/3 width) */}
+          <Grid
+            size={{ xs: 12, md: 8 }}
+            sx={{ height: "100%", overflow: "auto", p: 2 }}
+          >
+            <ImageDisplay images={images} loading={loading} error={error} />
+          </Grid>
+        </Grid>
+      </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            mt: "auto",
-            pt: 2,
-            pb: 1,
-          }}
-        >
-          <Link href="/about" color="secondary" component={NextLink}>
-            Go to the about page
-          </Link>
-          <Copyright />
-        </Box>
-      </Container>
-    </>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          pt: 2,
+          pb: 1,
+        }}
+      >
+        <Link href="/about" color="secondary" component={NextLink}>
+          Go to the about page
+        </Link>
+        <Copyright />
+      </Box>
+    </Box>
   );
 }

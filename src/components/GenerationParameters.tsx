@@ -10,9 +10,7 @@ import {
   MenuItem,
   Select,
   Slider,
-  Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 
 type GenerationParametersProps = {
@@ -101,18 +99,17 @@ const GenerationParameters = ({
           </FormLabel>
           <TextField
             type="number"
-            inputProps={{ min: "0", max: "40" }}
             value={runwareConfig.steps}
             onChange={(e) =>
-              handleNumericInputChange("steps", e.target.value, 0, 40)
+              handleNumericInputChange("steps", e.target.value, 1, 50)
             }
             size="small"
             sx={{ width: "80px" }}
           />
         </Box>
         <Slider
-          min={0}
-          max={40}
+          min={1}
+          max={50}
           value={Number(runwareConfig.steps)}
           onChange={(_, value) => handleRunwareConfigChange("steps", value)}
           valueLabelDisplay="auto"
@@ -133,10 +130,9 @@ const GenerationParameters = ({
           </FormLabel>
           <TextField
             type="number"
-            inputProps={{ min: "0", max: "10" }}
             value={runwareConfig.clipSkip}
             onChange={(e) =>
-              handleNumericInputChange("clipSkip", e.target.value, 0, 10)
+              handleNumericInputChange("clipSkip", e.target.value, 0, 2)
             }
             size="small"
             sx={{ width: "80px" }}
@@ -144,7 +140,7 @@ const GenerationParameters = ({
         </Box>
         <Slider
           min={0}
-          max={10}
+          max={2}
           value={Number(runwareConfig.clipSkip)}
           onChange={(_, value) => handleRunwareConfigChange("clipSkip", value)}
           valueLabelDisplay="auto"
@@ -165,10 +161,9 @@ const GenerationParameters = ({
           </FormLabel>
           <TextField
             type="number"
-            inputProps={{ min: "0", max: "10" }}
             value={runwareConfig.CFGScale}
             onChange={(e) =>
-              handleNumericInputChange("CFGScale", e.target.value, 0, 10)
+              handleNumericInputChange("CFGScale", e.target.value, 0, 30)
             }
             size="small"
             sx={{ width: "80px" }}
@@ -176,7 +171,7 @@ const GenerationParameters = ({
         </Box>
         <Slider
           min={0}
-          max={10}
+          max={30}
           value={Number(runwareConfig.CFGScale)}
           onChange={(_, value) => handleRunwareConfigChange("CFGScale", value)}
           valueLabelDisplay="auto"

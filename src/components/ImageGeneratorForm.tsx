@@ -9,6 +9,7 @@ import GenerationParameters from "./GenerationParameters";
 import ModelSelection from "./ModelSelection";
 import ApiProviderSelector from "./ApiProviderSelector";
 import { PROMPT_SUGGESTIONS, SIZE_PRESETS } from "@/constants";
+import { Paper, Box } from "@mui/material";
 
 type ImageGeneratorFormProps = {
   setImages: (images: Partial<ITextToImage>[] | null) => void;
@@ -153,8 +154,8 @@ const ImageGeneratorForm = ({
   };
 
   return (
-    <div className="rounded-lg shadow-md p-6">
-      <form onSubmit={handleSubmit}>
+    <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+      <Box component="form" onSubmit={handleSubmit}>
         <ApiProviderSelector
           apiChoice={apiChoice}
           setApiChoice={setApiChoice}
@@ -190,8 +191,8 @@ const ImageGeneratorForm = ({
             />
           </>
         )}
-      </form>
-    </div>
+      </Box>
+    </Paper>
   );
 };
 
