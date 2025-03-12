@@ -3,9 +3,11 @@ import React from "react";
 import {
   Box,
   Button,
-  Chip,
+  FormControl,
   FormLabel,
   Grid,
+  MenuItem,
+  Select,
   Slider,
   Stack,
   TextField,
@@ -39,9 +41,17 @@ const ImageSizeSection = ({
   handleNumericInputChange,
   sizePresets,
 }: ImageSizeSectionProps) => {
+  const currentSizeValue = `${runwareConfig.width}x${runwareConfig.height}`;
+
+  const handleSizePresetChange = (event: any) => {
+    const [width, height] = event.target.value.split("x").map(Number);
+    handleRunwareConfigChange("width", width);
+    handleRunwareConfigChange("height", height);
+  };
+
   return (
     <Box>
-      <Grid container spacing={2} sx={{ mb: 2 }}>
+      <Grid container spacing={2} sx={{ mb: 0 }}>
         <Grid item xs={6}>
           <Box sx={{ mb: 2 }}>
             <Box
@@ -53,11 +63,10 @@ const ImageSizeSection = ({
               }}
             >
               <FormLabel sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
-                Width: {runwareConfig.width}px
+                Width:
               </FormLabel>
               <TextField
                 type="number"
-                inputProps={{ min: "256", max: "2048", step: "64" }}
                 value={runwareConfig.width}
                 onChange={(e) =>
                   handleNumericInputChange("width", e.target.value, 256, 2048)
@@ -65,15 +74,10 @@ const ImageSizeSection = ({
                 size="small"
                 sx={{ width: "80px" }}
               />
+              <FormLabel sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
+                px
+              </FormLabel>
             </Box>
-            <Slider
-              min={256}
-              max={2048}
-              step={64}
-              value={Number(runwareConfig.width)}
-              onChange={(_, value) => handleRunwareConfigChange("width", value)}
-              valueLabelDisplay="auto"
-            />
           </Box>
         </Grid>
 
@@ -88,7 +92,7 @@ const ImageSizeSection = ({
               }}
             >
               <FormLabel sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
-                Height: {runwareConfig.height}px
+                Height:
               </FormLabel>
               <TextField
                 type="number"
@@ -100,59 +104,45 @@ const ImageSizeSection = ({
                 size="small"
                 sx={{ width: "80px" }}
               />
+              <FormLabel sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
+                px
+              </FormLabel>
             </Box>
-            <Slider
-              min={256}
-              max={2048}
-              step={64}
-              value={Number(runwareConfig.height)}
-              onChange={(_, value) =>
-                handleRunwareConfigChange("height", value)
-              }
-              valueLabelDisplay="auto"
-            />
           </Box>
         </Grid>
       </Grid>
 
       <Box sx={{ mb: 2 }}>
-        <FormLabel
-          sx={{
-            fontSize: "0.875rem",
-            color: "text.secondary",
-            display: "block",
-            mb: 1,
-          }}
-        >
-          Popular Sizes:
-        </FormLabel>
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-          {sizePresets.map((size) => (
-            <Chip
-              key={`${size.width}x${size.height}`}
-              label={size.label}
-              onClick={() => {
-                handleRunwareConfigChange("width", size.width);
-                handleRunwareConfigChange("height", size.height);
-              }}
-              variant={
-                runwareConfig.width === size.width &&
-                runwareConfig.height === size.height
-                  ? "filled"
-                  : "outlined"
-              }
-              color={
-                runwareConfig.width === size.width &&
-                runwareConfig.height === size.height
-                  ? "primary"
-                  : "default"
-              }
-              size="small"
-              sx={{ m: 0.5 }}
-              clickable
-            />
-          ))}
-        </Stack>
+        <FormControl fullWidth size="small">
+          <FormLabel
+            sx={{
+              fontSize: "0.875rem",
+              color: "text.secondary",
+              display: "block",
+              mb: 1,
+            }}
+          >
+            Popular Sizes:
+          </FormLabel>
+          <Select
+            value={currentSizeValue}
+            onChange={handleSizePresetChange}
+            displayEmpty
+            sx={{ minWidth: 150 }}
+          >
+            <MenuItem disabled value="">
+              <em>Select a size</em>
+            </MenuItem>
+            {sizePresets.map((size) => (
+              <MenuItem
+                key={`${size.width}x${size.height}`}
+                value={`${size.width}x${size.height}`}
+              >
+                {size.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
     </Box>
   );

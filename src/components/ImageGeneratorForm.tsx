@@ -8,7 +8,12 @@ import ImageSizeSection from "./ImageSizeSection";
 import GenerationParameters from "./GenerationParameters";
 import ModelSelection from "./ModelSelection";
 import ApiProviderSelector from "./ApiProviderSelector";
-import { PROMPT_SUGGESTIONS, SIZE_PRESETS } from "@/constants";
+import {
+  MODEL_OPENAI_OPTIONS,
+  MODEL_RUNWARE_OPTIONS,
+  PROMPT_SUGGESTIONS,
+  SIZE_PRESETS,
+} from "@/constants";
 import { Paper, Box } from "@mui/material";
 
 type ImageGeneratorFormProps = {
@@ -16,6 +21,8 @@ type ImageGeneratorFormProps = {
   setLoading: (loading: boolean) => void;
   loading: boolean;
   setError: (error: string | null) => void;
+  onGenerationStart: (count: number) => void; // New prop
+  onGenerationComplete: () => void; // New prop
 };
 
 const ImageGeneratorForm = ({
@@ -23,13 +30,18 @@ const ImageGeneratorForm = ({
   setLoading,
   loading,
   setError,
+  onGenerationStart,
+  onGenerationComplete,
 }: ImageGeneratorFormProps) => {
   const [apiChoice, setApiChoice] = useState<"openai" | "runware">("runware");
+  const [modelOptions, setModelOptions] = useState<
+    { label: string; value: string }[]
+  >(MODEL_RUNWARE_OPTIONS);
 
   const [runwareConfig, setRunwareConfig] = useState<IRequestImage>({
     positivePrompt: "",
     negativePrompt: "",
-    model: "urn:air:flux1:checkpoint:civitai:618692@691639",
+    model: modelOptions[0].value,
     width: 512,
     height: 512,
     numberResults: 1,
@@ -37,9 +49,24 @@ const ImageGeneratorForm = ({
     steps: 25,
     clipSkip: 2,
     CFGScale: 7,
+    scheduler: "Euler Beta",
     checkNSFW: false,
+    includeCost: true,
     outputType: "URL",
   });
+
+  const onSetApiChoice = (choice: "openai" | "runware") => {
+    setApiChoice(choice);
+    setModelOptions(
+      choice === "openai" ? MODEL_OPENAI_OPTIONS : MODEL_RUNWARE_OPTIONS
+    );
+    handleRunwareConfigChange(
+      "model",
+      choice === "openai"
+        ? MODEL_OPENAI_OPTIONS[0].value
+        : MODEL_RUNWARE_OPTIONS[0].value
+    );
+  };
 
   const handleRunwareConfigChange = <T,>(
     key: keyof IRequestImage,
@@ -121,9 +148,11 @@ const ImageGeneratorForm = ({
       return;
     }
 
-    setLoading(true);
-    setError(null);
-    setImages(null);
+    // Calculate how many images will be generated
+    const count = apiChoice === "openai" ? 1 : runwareConfig.numberResults;
+
+    // Signal generation start with count
+    onGenerationStart(count);
 
     try {
       if (apiChoice === "openai") {
@@ -149,7 +178,7 @@ const ImageGeneratorForm = ({
       );
       setImages(null);
     } finally {
-      setLoading(false);
+      onGenerationComplete();
     }
   };
 
@@ -158,10 +187,11 @@ const ImageGeneratorForm = ({
       <Box component="form" onSubmit={handleSubmit}>
         <ApiProviderSelector
           apiChoice={apiChoice}
-          setApiChoice={setApiChoice}
+          setApiChoice={onSetApiChoice}
         />
 
         <ModelSelection
+          modelOptions={modelOptions}
           runwareConfig={runwareConfig}
           handleRunwareConfigChange={handleRunwareConfigChange}
         />
@@ -176,7 +206,7 @@ const ImageGeneratorForm = ({
           handleSubmit={handleSubmit}
         />
 
-        {apiChoice === "runware" && (
+        {apiChoice === "runware" ? (
           <>
             <ImageSizeSection
               runwareConfig={runwareConfig}
@@ -190,7 +220,7 @@ const ImageGeneratorForm = ({
               handleNumericInputChange={handleNumericInputChange}
             />
           </>
-        )}
+        ) : null}
       </Box>
     </Paper>
   );

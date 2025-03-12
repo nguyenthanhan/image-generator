@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ITextToImage } from "@runware/sdk-js";
+import Image from "next/image";
 import {
   Box,
   CircularProgress,
@@ -19,12 +20,18 @@ import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
 
 type ImageDisplayProps = {
-  images: Partial<ITextToImage>[] | null;
+  images: Partial<ITextToImage>[];
   loading: boolean;
   error: string | null;
+  pendingCount: number; // Number of images being generated
 };
 
-const ImageDisplay = ({ images, loading, error }: ImageDisplayProps) => {
+const ImageDisplay = ({
+  images,
+  loading,
+  error,
+  pendingCount,
+}: ImageDisplayProps) => {
   // State for modal
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -81,10 +88,13 @@ const ImageDisplay = ({ images, loading, error }: ImageDisplayProps) => {
     }
   };
 
-  if (loading) {
-    return (
-      <ImageList sx={{ width: "100%", height: "auto" }} cols={3} gap={8}>
+  // Function to render loading placeholder items
+  const renderLoadingItems = () => {
+    const loadingItems = [];
+    for (let i = 0; i < pendingCount; i++) {
+      loadingItems.push(
         <ImageListItem
+          key={`loading-${i}`}
           sx={{
             border: 1,
             borderColor: "divider",
@@ -106,91 +116,84 @@ const ImageDisplay = ({ images, loading, error }: ImageDisplayProps) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              flexDirection: "column",
               textAlign: "center",
               p: 2,
             }}
           >
-            <Box>
-              <ImageIcon
-                sx={{ fontSize: 48, mb: 1, color: "text.secondary" }}
-              />
-              <Typography color="text.secondary" variant="body2">
-                Generating your image...
-              </Typography>
-            </Box>
+            <CircularProgress size={40} sx={{ mb: 2 }} />
+            <Typography color="text.secondary" variant="body2">
+              Generating image {i + 1}...
+            </Typography>
           </Box>
         </ImageListItem>
-      </ImageList>
-    );
-  }
+      );
+    }
+    return loadingItems;
+  };
 
-  if (error) {
+  if (error && images.length === 0 && pendingCount === 0) {
     return (
-      <Paper
-        elevation={3}
+      <ImageListItem
         sx={{
-          p: 3,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          maxWidth: "500px",
-          maxHeight: "500px",
+          border: 1,
+          borderColor: "error.light",
+          borderRadius: 1,
+          position: "relative",
+          paddingTop: "100%",
+          display: "block",
+          boxShadow: 1,
+          overflow: "hidden",
+          maxWidth: 500,
         }}
       >
-        <Box sx={{ textAlign: "center" }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            textAlign: "center",
+            p: 2,
+          }}
+        >
           <ErrorOutlineIcon color="error" sx={{ fontSize: 48, mb: 1 }} />
           <Typography color="error">{error}</Typography>
         </Box>
-      </Paper>
+      </ImageListItem>
     );
   }
 
-  if (!images || images.length === 0) {
+  if (images.length === 0 && !loading && pendingCount === 0) {
     return (
-      <ImageList sx={{ width: "100%", height: "auto" }} cols={3} gap={8}>
-        <ImageListItem
-          sx={{
-            border: 1,
-            borderColor: "divider",
-            borderRadius: 1,
-            position: "relative",
-            paddingTop: "100%",
-            display: "block",
-            boxShadow: 1,
-            overflow: "hidden",
-          }}
-        >
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-              p: 2,
-            }}
-          >
-            <Box>
-              <ImageIcon
-                sx={{ fontSize: 48, mb: 1, color: "text.secondary" }}
-              />
-              <Typography color="text.secondary" variant="body2">
-                Your generated images will appear here
-              </Typography>
-            </Box>
-          </Box>
-        </ImageListItem>
-      </ImageList>
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+          textAlign: "center",
+          p: 4,
+        }}
+      >
+        <ImageIcon sx={{ fontSize: 48, mb: 2, color: "text.secondary" }} />
+        <Typography color="text.secondary" variant="body2">
+          Your generated images will appear here
+        </Typography>
+      </Box>
     );
   }
 
   return (
     <>
       <ImageList sx={{ width: "100%", height: "auto" }} cols={3} gap={8}>
+        {/* Completed images */}
         {images.map((item) => (
           <ImageListItem
             key={item.imageURL}
@@ -202,14 +205,47 @@ const ImageDisplay = ({ images, loading, error }: ImageDisplayProps) => {
                 transform: "scale(1.02)",
                 boxShadow: 3,
               },
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            <img
-              srcSet={`${item.imageURL}?w=500&h=500&fit=crop&auto=format&dpr=2 2x`}
-              src={`${item.imageURL}?w=500&h=500&fit=crop&auto=format`}
-              alt={item.seed?.toString()}
-              loading="lazy"
-            />
+            {item.imageURL ? (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  position: "relative",
+                  aspectRatio: "1/1",
+                }}
+              >
+                <Image
+                  src={item.imageURL}
+                  alt={item.seed?.toString() || "Generated image"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  style={{
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  minHeight: 200,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "background.paper",
+                }}
+              >
+                <ErrorOutlineIcon color="error" />
+                <Typography color="error" variant="caption">
+                  Image failed to load
+                </Typography>
+              </Box>
+            )}
             <ImageListItemBar
               title={item.seed}
               subtitle={item.taskType}
@@ -224,76 +260,10 @@ const ImageDisplay = ({ images, loading, error }: ImageDisplayProps) => {
             />
           </ImageListItem>
         ))}
-      </ImageList>
 
-      {/* Modal for full-size image display */}
-      <Modal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        aria-labelledby="full-image-modal"
-        aria-describedby="modal-showing-full-size-image"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            maxWidth: "90vw",
-            maxHeight: "90vh",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 1,
-            outline: "none",
-            borderRadius: 2,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              mb: 1,
-              gap: 1,
-            }}
-          >
-            <Tooltip title="Download image">
-              <IconButton
-                onClick={handleDownloadImage}
-                aria-label="download image"
-                color="primary"
-              >
-                <DownloadIcon />
-              </IconButton>
-            </Tooltip>
-            <IconButton onClick={handleCloseModal} aria-label="close">
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <Box
-            sx={{
-              overflow: "auto",
-              maxHeight: "calc(90vh - 48px)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {selectedImage && (
-              <img
-                src={selectedImage}
-                alt="Full size"
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                }}
-              />
-            )}
-          </Box>
-        </Box>
-      </Modal>
+        {/* Loading placeholders */}
+        {loading && renderLoadingItems()}
+      </ImageList>
     </>
   );
 };

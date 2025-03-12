@@ -1,5 +1,5 @@
 import { IRequestImage } from "@runware/sdk-js";
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -9,6 +9,8 @@ import {
   TextField,
   Typography,
   Stack,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 
 type PromptSectionProps = {
@@ -33,6 +35,21 @@ const PromptSection = ({
   loading,
   handleSubmit,
 }: PromptSectionProps) => {
+  const [showNegativePrompt, setShowNegativePrompt] = useState(false);
+
+  // Handle toggle for negative prompt
+  const handleNegativePromptToggle = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const isEnabled = event.target.checked;
+    setShowNegativePrompt(isEnabled);
+
+    // Clear negative prompt when disabled
+    if (!isEnabled) {
+      handleRunwareConfigChange("negativePrompt", "");
+    }
+  };
+
   return (
     <Box sx={{ mb: 4 }}>
       <FormControl fullWidth sx={{ mb: 2 }}>
@@ -58,6 +75,42 @@ const PromptSection = ({
           required
           variant="outlined"
         />
+      </FormControl>
+
+      <FormControl fullWidth sx={{ mt: 0 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showNegativePrompt}
+              onChange={handleNegativePromptToggle}
+              color="primary"
+            />
+          }
+          label="Use Negative Prompt"
+        />
+
+        {showNegativePrompt && (
+          <>
+            <FormLabel
+              htmlFor="negativePrompt"
+              sx={{ mb: 1, mt: 1, fontSize: "0.875rem", fontWeight: 500 }}
+            >
+              Negative Prompt:
+            </FormLabel>
+            <TextField
+              id="negativePrompt"
+              multiline
+              rows={4}
+              fullWidth
+              value={runwareConfig?.negativePrompt}
+              onChange={(e) =>
+                handleRunwareConfigChange("negativePrompt", e.target.value)
+              }
+              placeholder="E.g., simple background, no people"
+              variant="outlined"
+            />
+          </>
+        )}
       </FormControl>
 
       <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
@@ -87,27 +140,6 @@ const PromptSection = ({
           ))}
         </Stack>
       </Box>
-
-      <FormControl fullWidth sx={{ mt: 2 }}>
-        <FormLabel
-          htmlFor="negativePrompt"
-          sx={{ mb: 1, fontSize: "0.875rem", fontWeight: 500 }}
-        >
-          Negative Prompt (Optional):
-        </FormLabel>
-        <TextField
-          id="negativePrompt"
-          multiline
-          rows={4}
-          fullWidth
-          value={runwareConfig?.negativePrompt}
-          onChange={(e) =>
-            handleRunwareConfigChange("negativePrompt", e.target.value)
-          }
-          placeholder="E.g., simple background, no people"
-          variant="outlined"
-        />
-      </FormControl>
     </Box>
   );
 };

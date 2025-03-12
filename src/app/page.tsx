@@ -19,9 +19,29 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ModeSwitch from "@/components/ModeSwitch";
 
 export default function Home() {
-  const [images, setImages] = useState<Partial<ITextToImage>[] | null>(null);
+  const [images, setImages] = useState<Partial<ITextToImage>[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  const addImages = (newImages: Partial<ITextToImage>[] | null) => {
+    if (newImages) {
+      setImages((prevImages) => [...prevImages, ...newImages]);
+    }
+  };
+
+  // Updated function to track pending images
+  const handleGenerationStart = (count: number) => {
+    setLoading(true);
+    setPendingCount(count);
+    setError(null);
+  };
+
+  // Updated function to handle completion
+  const handleGenerationComplete = () => {
+    setLoading(false);
+    setPendingCount(0);
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -55,10 +75,12 @@ export default function Home() {
             }}
           >
             <ImageGeneratorForm
-              setImages={setImages}
+              setImages={addImages}
               setLoading={setLoading}
               loading={loading}
               setError={setError}
+              onGenerationStart={handleGenerationStart}
+              onGenerationComplete={handleGenerationComplete}
             />
           </Grid>
 
@@ -67,7 +89,12 @@ export default function Home() {
             size={{ xs: 12, md: 8 }}
             sx={{ height: "100%", overflow: "auto", p: 2 }}
           >
-            <ImageDisplay images={images} loading={loading} error={error} />
+            <ImageDisplay
+              images={images}
+              loading={loading}
+              error={error}
+              pendingCount={pendingCount}
+            />
           </Grid>
         </Grid>
       </Box>

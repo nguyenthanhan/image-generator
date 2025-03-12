@@ -2,20 +2,16 @@ import { IRequestImage } from "@runware/sdk-js";
 import React from "react";
 import {
   Box,
-  Chip,
   FormControl,
   FormLabel,
-  Stack,
   TextField,
   Typography,
+  Select,
+  MenuItem,
 } from "@mui/material";
 
-type ModelOption = {
-  label: string;
-  value: string;
-};
-
 type ModelSelectionProps = {
+  modelOptions: { label: string; value: string }[];
   runwareConfig: IRequestImage;
   handleRunwareConfigChange: (
     key: keyof IRequestImage,
@@ -24,60 +20,50 @@ type ModelSelectionProps = {
 };
 
 const ModelSelection = ({
+  modelOptions,
   runwareConfig,
   handleRunwareConfigChange,
 }: ModelSelectionProps) => {
-  const modelOptions: ModelOption[] = [
-    {
-      label: "Flux",
-      value: "urn:air:flux1:checkpoint:civitai:618692@691639",
-    },
-  ];
-
   return (
     <Box sx={{ mb: 2 }}>
       <FormControl fullWidth>
         <FormLabel
           sx={{ fontSize: "0.875rem", color: "text.secondary", mb: 1 }}
         >
-          Model URN:
+          Model AIR:
         </FormLabel>
         <TextField
           value={runwareConfig.model}
           onChange={(e) => handleRunwareConfigChange("model", e.target.value)}
           fullWidth
-          placeholder="Enter model URN (e.g., urn:air:other:checkpoint:civitai:1285819@1450739)"
+          placeholder="Enter model URN (e.g., rundiffusion:110@101)"
           size="small"
         />
       </FormControl>
       <Box sx={{ mt: 1 }}>
-        <Typography variant="caption" color="text.secondary">
-          Common models:
-        </Typography>
-        <Stack
-          direction="row"
-          spacing={1}
-          flexWrap="wrap"
-          useFlexGap
-          sx={{ mt: 0.5 }}
+        <Typography
+          variant="caption"
+          fontSize="0.875rem"
+          color="text.secondary"
         >
-          {modelOptions.map((model) => (
-            <Chip
-              key={model.value}
-              label={model.label}
-              onClick={() => handleRunwareConfigChange("model", model.value)}
-              variant={
-                runwareConfig.model === model.value ? "filled" : "outlined"
-              }
-              color={
-                runwareConfig.model === model.value ? "primary" : "default"
-              }
-              size="small"
-              sx={{ my: 0.5 }}
-              clickable
-            />
-          ))}
-        </Stack>
+          Models on Runware:
+        </Typography>
+        <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+          <Select
+            value={runwareConfig.model}
+            onChange={(e) => handleRunwareConfigChange("model", e.target.value)}
+            displayEmpty={false}
+          >
+            <MenuItem disabled value="">
+              <em>Select a model</em>
+            </MenuItem>
+            {modelOptions.map((model) => (
+              <MenuItem key={model.value} value={model.value}>
+                {model.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
     </Box>
   );
