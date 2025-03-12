@@ -18,16 +18,14 @@ import { Paper, Box } from "@mui/material";
 
 type ImageGeneratorFormProps = {
   setImages: (images: Partial<ITextToImage>[] | null) => void;
-  setLoading: (loading: boolean) => void;
   loading: boolean;
   setError: (error: string | null) => void;
-  onGenerationStart: (count: number) => void; // New prop
-  onGenerationComplete: () => void; // New prop
+  onGenerationStart: (count: number) => void;
+  onGenerationComplete: () => void;
 };
 
 const ImageGeneratorForm = ({
   setImages,
-  setLoading,
   loading,
   setError,
   onGenerationStart,
@@ -104,11 +102,6 @@ const ImageGeneratorForm = ({
     }));
   };
 
-  // Handler for output type changes
-  const handleOutputTypeChange = (value: IOutputType) => {
-    handleRunwareConfigChange("outputType", value);
-  };
-
   // Generate images using OpenAI
   const generateWithOpenAI = async (prompt: string) => {
     const params: ImageGenerateParams = {
@@ -152,7 +145,7 @@ const ImageGeneratorForm = ({
     const count = apiChoice === "openai" ? 1 : runwareConfig.numberResults;
 
     // Signal generation start with count
-    onGenerationStart(count);
+    onGenerationStart(count ?? 1);
 
     try {
       if (apiChoice === "openai") {

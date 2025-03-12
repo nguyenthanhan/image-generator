@@ -18,6 +18,8 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 type ImageDisplayProps = {
   images: Partial<ITextToImage>[];
@@ -35,11 +37,13 @@ const ImageDisplay = ({
   // State for modal
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
   // Handlers for modal
-  const handleOpenModal = (imageUrl: string | undefined) => {
+  const handleOpenModal = (imageUrl: string | undefined, index: number) => {
     if (imageUrl) {
       setSelectedImage(imageUrl);
+      setCurrentImageIndex(index);
       setModalOpen(true);
     }
   };
@@ -47,6 +51,25 @@ const ImageDisplay = ({
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedImage(null);
+  };
+
+  // Navigation handlers
+  const handlePreviousImage = () => {
+    if (images.length > 1) {
+      const newIndex =
+        currentImageIndex <= 0 ? images.length - 1 : currentImageIndex - 1;
+      setCurrentImageIndex(newIndex);
+      setSelectedImage(images[newIndex].imageURL || null);
+    }
+  };
+
+  const handleNextImage = () => {
+    if (images.length > 1) {
+      const newIndex =
+        currentImageIndex >= images.length - 1 ? 0 : currentImageIndex + 1;
+      setCurrentImageIndex(newIndex);
+      setSelectedImage(images[newIndex].imageURL || null);
+    }
   };
 
   // Handler for downloading the image
@@ -194,10 +217,10 @@ const ImageDisplay = ({
     <>
       <ImageList sx={{ width: "100%", height: "auto" }} cols={3} gap={8}>
         {/* Completed images */}
-        {images.map((item) => (
+        {images.map((item, index) => (
           <ImageListItem
             key={item.imageURL}
-            onClick={() => handleOpenModal(item.imageURL)}
+            onClick={() => handleOpenModal(item.imageURL, index)}
             sx={{
               cursor: "pointer",
               transition: "transform 0.2s",
@@ -258,12 +281,161 @@ const ImageDisplay = ({
                 </IconButton>
               }
             />
+            ,
           </ImageListItem>
         ))}
-
         {/* Loading placeholders */}
         {loading && renderLoadingItems()}
       </ImageList>
+
+      {/* Modal for full-size image viewing */}
+      <Modal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        aria-labelledby="full-image-modal"
+        aria-describedby="modal-to-view-full-size-image"
+      >
+        <Paper
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            maxWidth: "100vw",
+            maxHeight: "100vh",
+            bgcolor: "black",
+            outline: "none",
+            display: "flex",
+            flexDirection: "column",
+            m: 0,
+            p: 0,
+            borderRadius: 0,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              p: 2,
+              position: "absolute",
+              right: 0,
+              top: 0,
+              zIndex: 10,
+            }}
+          >
+            <Tooltip title="Download Image">
+              <IconButton
+                onClick={handleDownloadImage}
+                color="primary"
+                sx={{
+                  bgcolor: "rgba(255, 255, 255, 0.5)",
+                  "&:hover": { bgcolor: "rgba(255, 255, 255, 0.7)" },
+                }}
+              >
+                <DownloadIcon />
+              </IconButton>
+            </Tooltip>
+            <IconButton
+              onClick={handleCloseModal}
+              color="default"
+              sx={{
+                bgcolor: "rgba(255, 255, 255, 0.5)",
+                "&:hover": { bgcolor: "rgba(255, 255, 255, 0.7)" },
+                ml: 1,
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Box
+            sx={{
+              position: "relative",
+              width: "100vw",
+              height: "100vh",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              p: 0,
+            }}
+          >
+            {/* Left navigation button */}
+            {images.length > 1 && (
+              <IconButton
+                onClick={handlePreviousImage}
+                sx={{
+                  position: "absolute",
+                  left: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  bgcolor: "rgba(255, 255, 255, 0.5)",
+                  "&:hover": { bgcolor: "rgba(255, 255, 255, 0.7)" },
+                  zIndex: 10,
+                }}
+                size="large"
+              >
+                <ArrowBackIosNewIcon />
+              </IconButton>
+            )}
+
+            {selectedImage && (
+              <Box
+                component="img"
+                src={selectedImage}
+                alt="Full size image"
+                sx={{
+                  width: "auto",
+                  height: "auto",
+                  maxWidth: "95vw",
+                  maxHeight: "95vh",
+                  objectFit: "contain",
+                }}
+              />
+            )}
+
+            {/* Right navigation button */}
+            {images.length > 1 && (
+              <IconButton
+                onClick={handleNextImage}
+                sx={{
+                  position: "absolute",
+                  right: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  bgcolor: "rgba(255, 255, 255, 0.5)",
+                  "&:hover": { bgcolor: "rgba(255, 255, 255, 0.7)" },
+                  zIndex: 10,
+                }}
+                size="large"
+              >
+                <ArrowForwardIosIcon />
+              </IconButton>
+            )}
+          </Box>
+
+          {/* Image counter indicator */}
+          {images.length > 1 && (
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 16,
+                left: "50%",
+                transform: "translateX(-50%)",
+                bgcolor: "rgba(0, 0, 0, 0.5)",
+                color: "white",
+                px: 2,
+                py: 0.5,
+                borderRadius: 2,
+                zIndex: 10,
+              }}
+            >
+              <Typography variant="body2">
+                {currentImageIndex + 1} / {images.length}
+              </Typography>
+            </Box>
+          )}
+        </Paper>
+      </Modal>
     </>
   );
 };
