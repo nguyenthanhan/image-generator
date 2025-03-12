@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ITextToImage } from "@runware/sdk-js";
 import Image from "next/image";
 import {
@@ -54,23 +54,28 @@ const ImageDisplay = ({
   };
 
   // Navigation handlers
-  const handlePreviousImage = () => {
+  const handlePreviousImage = useCallback(() => {
     if (images.length > 1) {
-      const newIndex =
-        currentImageIndex <= 0 ? images.length - 1 : currentImageIndex - 1;
-      setCurrentImageIndex(newIndex);
-      setSelectedImage(images[newIndex].imageURL || null);
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex <= 0 ? images.length - 1 : prevIndex - 1
+      );
+      setCurrentImageIndex((prevIndex) => {
+        const newIndex = prevIndex <= 0 ? images.length - 1 : prevIndex - 1;
+        setSelectedImage(images[newIndex]?.imageURL || null);
+        return newIndex;
+      });
     }
-  };
+  }, [images]);
 
-  const handleNextImage = () => {
+  const handleNextImage = useCallback(() => {
     if (images.length > 1) {
-      const newIndex =
-        currentImageIndex >= images.length - 1 ? 0 : currentImageIndex + 1;
-      setCurrentImageIndex(newIndex);
-      setSelectedImage(images[newIndex].imageURL || null);
+      setCurrentImageIndex((prevIndex) => {
+        const newIndex = prevIndex >= images.length - 1 ? 0 : prevIndex + 1;
+        setSelectedImage(images[newIndex]?.imageURL || null);
+        return newIndex;
+      });
     }
-  };
+  }, [images]);
 
   // Handler for downloading the image
   const handleDownloadImage = async () => {
@@ -110,6 +115,32 @@ const ImageDisplay = ({
       }
     }
   };
+
+  // Handler for keyboard navigation using useCallback to prevent recreation on every render
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft" || event.key === "a") {
+        handlePreviousImage();
+      } else if (event.key === "ArrowRight" || event.key === "d") {
+        handleNextImage();
+      }
+    },
+    [handlePreviousImage, handleNextImage]
+  );
+
+  // Add/remove event listeners when modal state changes
+  useEffect(() => {
+    if (modalOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      window.removeEventListener("keydown", handleKeyDown);
+    }
+
+    // Cleanup on unmount or modal close
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [modalOpen, handleKeyDown]); // Include handleKeyDown in dependencies
 
   // Function to render loading placeholder items
   const renderLoadingItems = () => {
@@ -216,6 +247,9 @@ const ImageDisplay = ({
   return (
     <>
       <ImageList sx={{ width: "100%", height: "auto" }} cols={3} gap={8}>
+        {/* Loading placeholders first */}
+        {loading && renderLoadingItems()}
+
         {/* Completed images */}
         {images.map((item, index) => (
           <ImageListItem
@@ -281,11 +315,8 @@ const ImageDisplay = ({
                 </IconButton>
               }
             />
-            ,
           </ImageListItem>
         ))}
-        {/* Loading placeholders */}
-        {loading && renderLoadingItems()}
       </ImageList>
 
       {/* Modal for full-size image viewing */}

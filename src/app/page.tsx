@@ -17,16 +17,31 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ModeSwitch from "@/components/ModeSwitch";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import HomeIcon from "@mui/icons-material/Home";
+import InfoIcon from "@mui/icons-material/Info";
+import ImageIcon from "@mui/icons-material/Image";
+import Divider from "@mui/material/Divider";
 
 export default function Home() {
   const [images, setImages] = useState<Partial<ITextToImage>[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   const addImages = (newImages: Partial<ITextToImage>[] | null) => {
     if (newImages) {
-      setImages((prevImages) => [...prevImages, ...newImages]);
+      setImages((prevImages) => [...newImages, ...prevImages]);
     }
   };
 
@@ -43,6 +58,40 @@ export default function Home() {
     setPendingCount(0);
   };
 
+  const sidebarContent = (
+    <Box sx={{ width: 250 }} role="presentation">
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton component={NextLink} href="/">
+            <ListItemIcon>
+              <HomeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Home" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton component={NextLink} href="/about">
+            <ListItemIcon>
+              <InfoIcon />
+            </ListItemIcon>
+            <ListItemText primary="About" />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      <Divider />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton>
+            <ListItemIcon>
+              <ImageIcon />
+            </ListItemIcon>
+            <ListItemText primary="My Images" />
+          </ListItemButton>
+        </ListItem>
+      </List>
+    </Box>
+  );
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <AppBar position="static">
@@ -53,6 +102,7 @@ export default function Home() {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
+            onClick={toggleSidebar}
           >
             <MenuIcon />
           </IconButton>
@@ -62,6 +112,10 @@ export default function Home() {
           <ModeSwitch />
         </Toolbar>
       </AppBar>
+
+      <Drawer anchor="left" open={sidebarOpen} onClose={toggleSidebar}>
+        {sidebarContent}
+      </Drawer>
 
       <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
         <Grid container sx={{ height: "100%" }}>
@@ -76,7 +130,6 @@ export default function Home() {
           >
             <ImageGeneratorForm
               setImages={addImages}
-              setLoading={setLoading}
               loading={loading}
               setError={setError}
               onGenerationStart={handleGenerationStart}
