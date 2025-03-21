@@ -70,7 +70,7 @@ const GenerationParameters = ({
                 step={1}
                 value={Number(runwareConfig.numberResults)}
                 onChange={(_, value) =>
-                  handleRunwareConfigChange("numberResults", value)
+                  handleRunwareConfigChange("numberResults", value as number)
                 }
                 valueLabelDisplay="auto"
                 marks={Array(8)
@@ -156,7 +156,9 @@ const GenerationParameters = ({
               min={1}
               max={50}
               value={Number(runwareConfig.steps)}
-              onChange={(_, value) => handleRunwareConfigChange("steps", value)}
+              onChange={(_, value) =>
+                handleRunwareConfigChange("steps", value as number)
+              }
               valueLabelDisplay="auto"
             />
           </Box>
@@ -188,7 +190,7 @@ const GenerationParameters = ({
               max={2}
               value={Number(runwareConfig.clipSkip)}
               onChange={(_, value) =>
-                handleRunwareConfigChange("clipSkip", value)
+                handleRunwareConfigChange("clipSkip", value as number)
               }
               valueLabelDisplay="auto"
             />
@@ -221,7 +223,7 @@ const GenerationParameters = ({
               max={30}
               value={Number(runwareConfig.CFGScale)}
               onChange={(_, value) =>
-                handleRunwareConfigChange("CFGScale", value)
+                handleRunwareConfigChange("CFGScale", value as number)
               }
               valueLabelDisplay="auto"
             />
