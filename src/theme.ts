@@ -32,6 +32,9 @@ const theme = createTheme({
       },
     },
   },
+  palette: {
+    mode: 'light', // Set default theme to light
+  },
 });
 
 export default theme;
